@@ -1,0 +1,274 @@
+local MarketplaceService = game:GetService("MarketplaceService")
+local InsertService = game:GetService("InsertService")
+
+function getImageIdFromDecal(decalId)
+	local assetInfo = MarketplaceService:GetProductInfo(decalId, Enum.InfoType.Asset)
+
+	assert(assetInfo.IsPublicDomain)
+	assert(assetInfo.AssetTypeId == Enum.AssetType.Decal.Value)
+
+	local decal = InsertService:LoadAsset(decalId):FindFirstChildWhichIsA("Decal")
+	return decal.Texture
+end
+
+game.ReplicatedStorage.ReturnToMainMenu.OnServerEvent:Connect(function(player)
+	player.PlayerGui.MainGUI.PracticeFlaggle.Visible = false
+	player.PlayerGui.MainGUI.MainMenuFrame.Visible = true
+end)
+
+game.ReplicatedStorage.DailySetUp.OnServerEvent:Connect(function(player)
+	local MainGUI = player.PlayerGui.MainGUI
+	local chosenCountry = nil
+	local randomId = nil
+	
+	game.ReplicatedStorage.Guesses.Value = 0
+	
+	for i,v in pairs(MainGUI.PracticeFlaggle.BlackSquares:GetChildren()) do
+		if v:IsA("TextLabel") then
+			v.Visible = true
+			v.BackgroundTransparency = 0
+		end
+	end
+	
+	for i,v in pairs(game.ReplicatedStorage.Flags:GetChildren()) do
+		if string.lower(v.Name) == string.lower(game.ReplicatedStorage.DailyAnswer.Value) then
+			chosenCountry = v.Name
+		end
+	end
+	
+	randomId = getImageIdFromDecal(game.ReplicatedStorage.Flags[chosenCountry].Value)
+	game.ReplicatedStorage.Answer.Value = string.upper(chosenCountry)
+	game.ReplicatedStorage.DailyAnswer.Value = string.upper(chosenCountry)
+	
+	MainGUI.PracticeFlaggle.HiddenCountry.Image = randomId
+	MainGUI.MainMenuFrame.Visible = false
+	
+	MainGUI.PracticeFlaggle.StatusBar.Text = "Enter the name of a country to begin."
+	MainGUI.PracticeFlaggle.PreviousGuess.Country.Text = "N/A"
+	MainGUI.PracticeFlaggle.PreviousGuess.Continent.TextColor3 = Color3.fromRGB(0,0,0)
+	MainGUI.PracticeFlaggle.PreviousGuess.Continent.Text = "N/A"
+	MainGUI.PracticeFlaggle.PreviousGuess.ImageLabel.Image = ""
+	MainGUI.PracticeFlaggle.Return.Visible = false
+	MainGUI.PracticeFlaggle.Guess.Visible = true
+	MainGUI.PracticeFlaggle.Country.Visible = true
+	MainGUI.MainMenuFrame.Visible = false
+	MainGUI.PracticeFlaggle.Visible = true
+end)
+
+game.ReplicatedStorage.SetUpGame.OnServerEvent:Connect(function(player)
+	local MainGUI = player.PlayerGui.MainGUI
+	local randomFlags = {}
+	local chosenCountry = nil
+	local randomId = nil
+	
+	game.ReplicatedStorage.Guesses.Value = 0
+	
+	for i,v in pairs(MainGUI.PracticeFlaggle.BlackSquares:GetChildren()) do
+		if v:IsA("TextLabel") then
+			v.Visible = true
+			v.BackgroundTransparency = 0
+		end
+	end
+	
+	for i,v in pairs(game.ReplicatedStorage.Flags:GetChildren()) do
+		table.insert(randomFlags, v.Name)
+	end
+	
+	chosenCountry = randomFlags[math.random(1,#randomFlags)]
+	randomId = getImageIdFromDecal(game.ReplicatedStorage.Flags[chosenCountry].Value)
+	game.ReplicatedStorage.Answer.Value = string.upper(chosenCountry)
+	
+	MainGUI.PracticeFlaggle.HiddenCountry.Image = randomId
+	MainGUI.MainMenuFrame.Visible = false
+	
+	MainGUI.PracticeFlaggle.StatusBar.Text = "Enter the name of a country to begin."
+	MainGUI.PracticeFlaggle.PreviousGuess.Country.Text = "N/A"
+	MainGUI.PracticeFlaggle.PreviousGuess.Continent.TextColor3 = Color3.fromRGB(0,0,0)
+	MainGUI.PracticeFlaggle.PreviousGuess.Continent.Text = "N/A"
+	MainGUI.PracticeFlaggle.PreviousGuess.ImageLabel.Image = ""
+	MainGUI.PracticeFlaggle.Return.Visible = false
+	MainGUI.PracticeFlaggle.Guess.Visible = true
+	MainGUI.PracticeFlaggle.Country.Visible = true
+	MainGUI.MainMenuFrame.Visible = false
+	MainGUI.PracticeFlaggle.Visible = true
+end)
+
+game.ReplicatedStorage.GuessCountry.OnServerEvent:Connect(function(player, guess)
+	player.PlayerGui.MainGUI.PracticeFlaggle.Country.Text = ""
+	
+	guess = string.lower(guess)
+	
+	if guess == "st vincent" or guess == "grenadines" then
+		guess = "st vincent and the grenadines"
+	elseif guess == "gambia" then
+		guess = "the gambia"
+	elseif guess == "rep of macedonia" or guess == "rep of north macedonia" or guess == "macedonia" or guess == "north macedonia" or guess == "republic of north macedonia" then
+		guess = "republic of north macedonia"
+	elseif guess == "dem rep of congo" or guess == "dem rep of the congo" then
+		guess = "democratic republic of the congo"
+	elseif guess == "rep of congo" or guess == "rep of the congo" then
+		guess = "republic of the congo"
+	elseif guess == "cape verde" then
+		guess = "cabo verde"
+	elseif guess == "uae" then
+		guess = "united arab emirates"
+	elseif guess == "uk" then
+		guess = "united kingdom"
+	elseif guess == "usa" then
+		guess = "united states of america"
+	elseif guess == "czech republic" then
+		guess = "czechia"
+	elseif guess == "the bahamas" then
+		guess = "bahamas"
+	elseif guess == "the netherlands" then
+		guess = "netherlands"
+	elseif guess == "cote d'ivoire" or guess == "cote d ivoire" then
+		guess = "ivory coast"
+	elseif guess == "federated states of micronesia" then
+		guess = "micronesia"
+	end
+	
+	local isInFlags = false
+	local isInCountries = false
+	local isNotRepeated = false
+	
+	for i,v in pairs(game.ReplicatedStorage.Flags:GetChildren()) do
+		if string.lower(v.Name) == guess then
+			isInFlags = true
+		end
+	end
+	
+	for i,v in pairs(game.ReplicatedStorage.Countries:GetDescendants()) do
+		if v:IsA("StringValue") then
+			if string.lower(v.Value) == guess then
+				isInCountries = true
+			end
+		end
+	end
+	
+	for i,v in pairs(game.ReplicatedStorage.Guesses:GetChildren()) do
+		if string.lower(v.Name) == guess then
+			isNotRepeated = true
+		end
+	end
+	
+	if isInFlags and isInCountries and isNotRepeated == false then
+		
+		-- if the country is actually valid
+		
+		game.ReplicatedStorage.Guesses.Value += 1
+		
+		player.PlayerGui.MainGUI.PracticeFlaggle.Country.Text = ""
+		
+		local GuessObj = Instance.new("StringValue", game.ReplicatedStorage.Guesses)
+		GuessObj.Name = guess
+		
+		local continentOfGuessedCountry = nil
+		local continentOfAnswer = nil
+		local guessedCountry = guess
+		
+		for i,v in pairs(game.ReplicatedStorage.Countries:GetDescendants()) do
+			if not v:IsA("Folder") then
+				if string.lower(v.Value) == guessedCountry then
+					continentOfGuessedCountry = v.Parent.Name
+				elseif string.lower(game.ReplicatedStorage.Answer.Value) == string.lower(v.Value) then
+					continentOfAnswer = v.Parent.Name
+				end
+			end
+		end
+		
+		if string.upper(guessedCountry) == game.ReplicatedStorage.Answer.Value then
+			
+			for i,v in pairs(player.PlayerGui.MainGUI.PracticeFlaggle.BlackSquares:GetChildren()) do
+				v.Visible = false
+			end
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Visible = false
+			player.PlayerGui.MainGUI.PracticeFlaggle.Country.Visible = false
+			
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.StatusBar.Text = "Correct! The answer was "..game.ReplicatedStorage.Answer.Value..". You got it in "..game.ReplicatedStorage.Guesses.Value.." guesses!"
+			player.PlayerGui.MainGUI.PracticeFlaggle.Return.Visible = true
+			
+			game.ReplicatedStorage.Guesses:ClearAllChildren()
+			
+		else
+			
+			local decalId = nil
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.Country.Text = string.upper(guessedCountry)
+			
+			if continentOfAnswer == continentOfGuessedCountry then
+				
+				-- if the two share the same continent
+				
+				player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.Continent.TextColor3 = Color3.fromRGB(0,255,0)
+				player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.Continent.Text = "Shares the same continent"
+				
+			else
+				
+				player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.Continent.TextColor3 = Color3.fromRGB(255,0,0)
+				player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.Continent.Text = "Does not share the same continent"
+				
+			end
+			
+			for i,v in pairs(game.ReplicatedStorage.Flags:GetChildren()) do
+				if string.lower(v.Name) == guessedCountry then
+					decalId = v.Value
+				end
+			end
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.PreviousGuess.ImageLabel.Image = getImageIdFromDecal(decalId)
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.StatusBar.Text = "Not quite right, but you're getting close!"
+			
+			local tableOfSquares = {}
+			local anothertableOfSquares = {}
+			local randomOne = nil
+			local randomTwo = nil
+			
+			for i,v in pairs(player.PlayerGui.MainGUI.PracticeFlaggle.BlackSquares:GetChildren()) do
+				if v.Visible == true then
+					table.insert(tableOfSquares, v.Name)
+				end
+			end
+			
+			player.PlayerGui.MainGUI.PracticeFlaggle.BlackSquares[tableOfSquares[math.random(1,#tableOfSquares)]].Visible = false
+			
+			if #tableOfSquares == 0 then
+				
+				-- if there are no more grey squares to remove
+				
+				player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Visible = false
+				player.PlayerGui.MainGUI.PracticeFlaggle.Country.Visible = false
+
+
+				player.PlayerGui.MainGUI.PracticeFlaggle.StatusBar.Text = "You took too many guesses. The answer was "..game.ReplicatedStorage.Answer.Value.."."
+				player.PlayerGui.MainGUI.PracticeFlaggle.Return.Visible = true
+				
+			end
+			
+		end
+		
+	elseif isNotRepeated == true then
+		
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.BackgroundColor3 = Color3.fromRGB(240,0,0)
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Text = "Already guessed"
+
+		wait(0.5)
+
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.BackgroundColor3 = Color3.fromRGB(85,170,0)
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Text = "GUESS"
+		
+	else
+		
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.BackgroundColor3 = Color3.fromRGB(240,0,0)
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Text = "Invalid country name"
+		
+		wait(0.5)
+		
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.BackgroundColor3 = Color3.fromRGB(85,170,0)
+		player.PlayerGui.MainGUI.PracticeFlaggle.Guess.Text = "GUESS"
+		
+	end
+end)
