@@ -1,0 +1,5 @@
+script.Parent.MouseButton1Click:Connect(function()
+	if script.Parent.Text == "GUESS" then
+		game.ReplicatedStorage.GuessCountry:FireServer(script.Parent.Parent.Country.Text)
+	end
+end)
