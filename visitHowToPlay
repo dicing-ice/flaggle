@@ -1,7 +1,0 @@
-script.Parent.MouseButton1Click:Connect(function()
-	script.Parent.Parent.Instructions.Visible = true
-	script.Parent.Visible = false
-	script.Parent.Parent.Practice.Visible = false
-	script.Parent.Parent.Daily.Visible = false
-	script.Parent.Parent.Timing.Visible = false
-end)
