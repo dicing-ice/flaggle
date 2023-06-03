@@ -1,0 +1,55 @@
+local DataStoreService = game:GetService("DataStoreService")
+local CountryFlagStore = DataStoreService:GetDataStore("EverydayFlagStores")
+local tableOfCountryNames = {}
+local syncedtime = require(script.Module)
+syncedtime.init()
+
+local function chooseDifferentDailyCountry(day)
+	for i,v in pairs(game.ReplicatedStorage.Flags:GetChildren()) do
+		table.insert(tableOfCountryNames, v.Name)
+	end
+	
+	local randomCountry = nil
+	
+	randomCountry = tableOfCountryNames[math.random(1, #tableOfCountryNames)]
+	
+	CountryFlagStore:SetAsync(day, randomCountry)
+	
+	game.ReplicatedStorage.DailyAnswer.Value = randomCountry
+end
+
+local function toHMS(s)
+	return string.format("%02i:%02i:%02i", s/60^2, s/60%60, s%60)
+end
+
+local currentDay
+local hourOffset = 0
+
+local offset = (60 * 60 * hourOffset)
+
+while true do
+	local day = math.floor((syncedtime.time() + offset) / (60 * 60 * 24))
+	local t = (math.floor(syncedtime.time())) - offset
+	local daypass = t % 86400
+	local timeleft = 86400 - daypass
+	local timeleftstring = toHMS(timeleft)
+	
+	game.ReplicatedStorage.Time.Value = timeleftstring
+	
+	if day ~= currentDay then
+		currentDay = day
+		local hasAsync = nil
+		
+		local success, errorMessage = pcall(function()
+			hasAsync = CountryFlagStore:GetAsync(currentDay)
+		end)
+		
+		if hasAsync ~= nil then
+			game.ReplicatedStorage.DailyAnswer.Value = CountryFlagStore:GetAsync(currentDay)
+		else
+			chooseDifferentDailyCountry(currentDay)
+		end
+	end
+	
+	wait(1)
+end
