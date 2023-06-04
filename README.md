@@ -1,4 +1,1 @@
--- This repository contains a lot of the scripts and code from my game, Flaggle.
--- The scripts that have 'Server' at the end are in the ServerScriptService, meaning they don't happen locally.
--- Keep in mind that these are just the MAJOR scripts.
--- There are tens of other minor scripts that don't need to be mentioned here because they are mostly 1-5 lines or copies/remakes of the other scripts.
+This repository contains a lot of the scripts and code from my game, Flaggle. The scripts that have 'Server' at the end are in the ServerScriptService, meaning they don't happen locally. Keep in mind that these are just the MAJOR scripts. There are tens of other minor scripts that don't need to be mentioned here because they are mostly 1-5 lines or copies/remakes of the other scripts.
