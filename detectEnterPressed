@@ -1,0 +1,7 @@
+script.Parent.Country.FocusLost:Connect(function(enter)
+	if enter then
+		if script.Parent.Country.Text ~= "" and script.Parent.Guess.Text == "GUESS" and script.Parent.Country.Visible == true and script.Parent.Guess.Visible == true then
+			game.ReplicatedStorage.GuessCountry:FireServer(script.Parent.Country.Text)
+		end
+	end
+end)
