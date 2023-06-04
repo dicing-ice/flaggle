@@ -1,0 +1,7 @@
+script.Parent.MouseButton1Click:Connect(function()
+	script.Parent.Parent.Visible = false
+	script.Parent.Parent.Parent.HowToPlay.Visible = true
+	script.Parent.Parent.Parent.Daily.Visible = true
+	script.Parent.Parent.Parent.Practice.Visible = true
+	script.Parent.Parent.Parent.Timing.Visible = true
+end)
